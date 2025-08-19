@@ -1,0 +1,9 @@
+
+=== Random Forest Training Run @ 2025-08-19T15:38:11 ===
+Loaded rows: 200
+Rows after target filtering: 200
+Train size: 160, Test size: 40
+R2: -0.1423
+MAE: 22.1280
+RMSE: 27.8410
+Model saved to: C:\Users\HP\OneDrive\Desktop\HVAC\HVAC-Energy-Analysis\Dynamic control\rm model\random_forest.joblib

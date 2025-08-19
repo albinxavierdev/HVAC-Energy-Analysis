@@ -6,10 +6,10 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import joblib
 
@@ -59,7 +59,7 @@ def _engineer_features(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = pd.to_datetime(df[col], errors="coerce", utc=True).dt.tz_convert(None)
 
     # Target: prefer actual_value; if missing, fall back to predicted_value
-    df["target_value"] = df["actual_value"].where(df["actual_value"].notna(), df["predicted_value"])
+    df["target_value"] = df["actual_value"].where(df["actual_value"].notna(), df["predicted_value"]) 
 
     # Drop rows without a target
     df = df[df["target_value"].notna()].copy()
@@ -86,7 +86,7 @@ def _build_pipeline(numeric_features, categorical_features) -> Pipeline:
     numeric_transformer = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", StandardScaler()),
+            # No scaler for RandomForest
         ]
     )
 
@@ -104,7 +104,11 @@ def _build_pipeline(numeric_features, categorical_features) -> Pipeline:
         ]
     )
 
-    model = LinearRegression()
+    model = RandomForestRegressor(
+        n_estimators=200,
+        random_state=42,
+        n_jobs=-1,
+    )
 
     pipeline = Pipeline(steps=[("preprocess", preprocessor), ("model", model)])
     return pipeline
@@ -118,11 +122,11 @@ def _log_run(log_path: Path, content: str) -> None:
 
 def main() -> None:
     project_root = _resolve_project_root()
-    logs_path = project_root / "lrmodel" / "linear_model.txt"
-    model_path = project_root / "lrmodel" / "linear_model.joblib"
+    logs_path = project_root / "rm model" / "random_forest.txt"
+    model_path = project_root / "rm model" / "random_forest.joblib"
 
     start_ts = datetime.now().isoformat(timespec="seconds")
-    _log_run(logs_path, f"\n=== Linear Model Training Run @ {start_ts} ===\n")
+    _log_run(logs_path, f"\n=== Random Forest Training Run @ {start_ts} ===\n")
 
     # 1) Load data
     engine = _get_engine()
