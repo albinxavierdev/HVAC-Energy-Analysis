@@ -27,3 +27,24 @@ efficiency, and better occupant comfort.
     historical and live data to improve efficiency over time.
 -   **Scalable Architecture**: Built on PostgreSQL for rules/control
     metadata and InfluxDB for high-frequency sensor data.
+
+## 📈 Linear Regression Training (Dynamic control)
+
+Location: `Dynamic control/lrmodel/`
+
+- `train_linear_model.py`: pulls data from PostgreSQL (`dynamic_control`),
+  engineers simple time/features, trains a Linear Regression model, logs
+  steps and metrics to `linear_model.txt`, and saves the model as
+  `linear_model.joblib`.
+- Model artifacts (`*.joblib`, etc.) are ignored by git; logs (`linear_model.txt`)
+  and code are committed so the workflow is reproducible.
+
+Run (PowerShell):
+
+```powershell
+.\v\Scripts\Activate.ps1
+pip install -r requirements.txt
+python "Dynamic control\lrmodel\train_linear_model.py"
+Get-Content "Dynamic control\lrmodel\linear_model.txt"
+```
+

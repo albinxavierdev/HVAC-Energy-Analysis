@@ -122,3 +122,9 @@ local_config.py
 *.temp
 *.bak
 *.backup
+
+# ML artifacts in Dynamic control (do not track trained models)
+Dynamic control/**/*.joblib
+Dynamic control/**/*.pkl
+Dynamic control/**/*.sav
+Dynamic control/**/*.h5

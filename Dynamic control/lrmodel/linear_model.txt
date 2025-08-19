@@ -1,0 +1,14 @@
+
+=== Linear Model Training Run @ 2025-08-19T13:21:02 ===
+Loaded rows: 200
+Rows after target filtering: 200
+Train size: 160, Test size: 40
+
+=== Linear Model Training Run @ 2025-08-19T13:24:14 ===
+Loaded rows: 200
+Rows after target filtering: 200
+Train size: 160, Test size: 40
+R2: -0.8979
+MAE: 28.3150
+RMSE: 35.8866
+Model saved to: C:\Users\ps\OneDrive\Desktop\hvac\lrmodel\linear_model.joblib
