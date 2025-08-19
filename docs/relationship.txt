@@ -1,0 +1,116 @@
+HVAC data model: tables and relationships
+
+1) Tables and main fields
+
+- dynamic_rules
+  - rule_id (UUID, primary key)
+  - equip_id (text)
+  - associated_equip_id (text, optional)
+  - target_point_id (text)
+  - frequency_predicted (integer, seconds)
+  - description (text)
+
+- bacnet_tables
+  - id (serial, primary key)
+  - campus_id (text)
+  - building_id (text)
+  - floor_id (text)
+  - project_equipment_id (text)
+  - equip_id (text)
+  - associated_equip_id (text, optional)
+  - point_id (text)
+
+- dynamic_control
+  - control_id (UUID, primary key)
+  - rule_id (UUID, foreign key to dynamic_rules.rule_id, delete cascade)
+  - equip_id (text)
+  - point_id (text)
+  - predicted_value (number)
+  - actual_value (number)
+  - created_at (timestamp, default now)
+  - predicted_for (timestamp)
+  - status (text, default 'pending')
+  - notes (text)
+
+2) What is linked today
+
+- dynamic_control.rule_id references dynamic_rules.rule_id
+  - One rule can have many control rows
+  - If you delete a rule, its control rows are deleted too (cascade)
+
+- There is no link today between:
+  - dynamic_rules and bacnet_tables
+  - dynamic_control and bacnet_tables
+
+3) Links we suggest adding (not enforced yet)
+
+- Use bacnet_tables as the master list of equipment points
+  - dynamic_rules (equip_id, target_point_id) should match a row in bacnet_tables (equip_id, point_id)
+    Foreign key to add: dynamic_rules (equip_id, target_point_id) -> bacnet_tables (equip_id, point_id)
+  - dynamic_control (equip_id, point_id) should match a row in bacnet_tables (equip_id, point_id)
+    Foreign key to add: dynamic_control (equip_id, point_id) -> bacnet_tables (equip_id, point_id)
+
+- Associated equipment
+  - If dynamic_rules.associated_equip_id is set, it should exist as a bacnet_tables.equip_id
+
+4) How the tables work together
+
+- bacnet_tables lists each equipment-point in the site
+  - Many rules can target the same equipment-point
+  - Many control rows can refer to the same equipment-point
+
+- dynamic_rules defines a rule for one equipment-point
+  - A rule produces many control rows over time (different predicted_for)
+
+- dynamic_control stores predictions/actuals for an equipment-point and time
+
+5) Useful indexes
+
+- bacnet_tables unique index on (equip_id, point_id)
+  - Prevents duplicates and enables foreign keys
+
+- dynamic_rules index on (equip_id, target_point_id)
+  - Makes joins to bacnet_tables faster
+
+- dynamic_control indexes on (rule_id), (equip_id, point_id), (predicted_for)
+  - Faster queries by rule, by point, and by time
+
+6) Data checks to consider
+
+- Make fields NOT NULL when needed (e.g., frequency_predicted must be > 0)
+- Limit status values to a small set: 'pending', 'applied', 'skipped', 'failed'
+- Pick numeric precision that fits your units (temperature, position, etc.)
+- If you add foreign keys to bacnet_tables, prefer ON DELETE RESTRICT on bacnet_tables so you do not remove points that other data depends on
+
+7) Common queries
+
+- Latest control row for a rule
+  SELECT ...
+  FROM dynamic_control dc
+  JOIN dynamic_rules r ON dc.rule_id = r.rule_id
+  WHERE r.rule_id = :rule_id
+  ORDER BY dc.predicted_for DESC
+  LIMIT 1;
+
+- Rules with location info for their points
+  SELECT r.*, b.campus_id, b.building_id, b.floor_id
+  FROM dynamic_rules r
+  LEFT JOIN bacnet_tables b
+    ON b.equip_id = r.equip_id AND b.point_id = r.target_point_id;
+
+- Control history for an equipment-point
+  SELECT dc.*
+  FROM dynamic_control dc
+  WHERE dc.equip_id = :equip AND dc.point_id = :point
+  ORDER BY dc.predicted_for DESC;
+
+8) Simple plan to improve relationships
+
+- Add a UNIQUE constraint on bacnet_tables (equip_id, point_id)
+- Fix any rules/controls whose (equip_id, point_id) do not exist in bacnet_tables
+- Add foreign keys:
+  - dynamic_rules (equip_id, target_point_id) -> bacnet_tables (equip_id, point_id)
+  - dynamic_control (equip_id, point_id) -> bacnet_tables (equip_id, point_id)
+- Add CHECK constraints (like status) and tighten NULL/NOT NULL where it makes sense
+
+This file explains the current link (dynamic_control -> dynamic_rules) and the recommended links through bacnet_tables to keep equipment-point data consistent.
