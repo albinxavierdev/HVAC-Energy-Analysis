@@ -1,0 +1,12 @@
+
+=== Random Forest GridSearchCV Run @ 2025-08-19T17:58:06 ===
+Loaded rows: 200
+Rows after target filtering: 200
+Train size: 160, Test size: 40
+Grid candidates: 32
+Best CV R2: -0.0402
+Best Params: {'model__max_depth': 20, 'model__max_features': 'sqrt', 'model__min_samples_leaf': 2, 'model__min_samples_split': 2, 'model__n_estimators': 300}
+Test R2: 0.0015
+Test MAE: 22.5546
+Test RMSE: 26.0291
+Best model saved to: C:\Users\HP\OneDrive\Desktop\HVAC\HVAC-Energy-Analysis\Dynamic control\gscv model\random_forest_gscv.joblib

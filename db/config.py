@@ -4,7 +4,7 @@ import os
 # Override via environment variables if needed.
 
 DB_USER = os.getenv("HVAC_DB_USER", "postgres")
-DB_PASSWORD = os.getenv("HVAC_DB_PASSWORD", "your_password")
+DB_PASSWORD = os.getenv("HVAC_DB_PASSWORD", "1234")
 DB_HOST = os.getenv("HVAC_DB_HOST", "localhost")
 DB_PORT = os.getenv("HVAC_DB_PORT", "5432")
 DB_NAME = os.getenv("HVAC_DB_NAME", "postgres")
