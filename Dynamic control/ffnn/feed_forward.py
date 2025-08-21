@@ -53,6 +53,20 @@ def _get_engine():
     return create_engine(db_url())
 
 
+def _log_path() -> Path:
+    # Persist a simple text log of the whole process in this module's folder
+    project_root = _resolve_project_root()
+    return project_root / "ffnn" / "ffnn_process.txt"
+
+
+def _log(message: str) -> None:
+    path = _log_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().isoformat(timespec="seconds")
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] {message}\n")
+
+
 def _fetch_dynamic_control(engine) -> pd.DataFrame:
     query = text(
         """
@@ -191,9 +205,14 @@ def _prepare_tensors(df: pd.DataFrame):
 
 
 def train_ffnn_local(hidden1=64, hidden2=32, lr=0.001, epochs=20, batch_size=64):
+    _log("=== FFNN training started ===")
+    _log(f"Config: hidden1={hidden1}, hidden2={hidden2}, lr={lr}, epochs={epochs}, batch_size={batch_size}")
+
     engine = _get_engine()
     df_raw = _fetch_dynamic_control(engine)
+    _log(f"Loaded rows from dynamic_control: {len(df_raw)}")
     df = _engineer_features(df_raw)
+    _log(f"Rows after target filtering: {len(df)}")
 
     (
         X_train_t,
@@ -211,6 +230,9 @@ def train_ffnn_local(hidden1=64, hidden2=32, lr=0.001, epochs=20, batch_size=64)
     train_dataset = torch.utils.data.TensorDataset(X_train_t, y_train_t)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
+    _log(f"Input size after preprocessing: {input_size}")
+    _log(f"Feature info: {feature_info}")
+
     model.train()
     for epoch in range(epochs):
         epoch_loss = 0.0
@@ -223,6 +245,7 @@ def train_ffnn_local(hidden1=64, hidden2=32, lr=0.001, epochs=20, batch_size=64)
             epoch_loss += loss.item() * xb.size(0)
         epoch_loss /= len(train_dataset)
         print(f"Epoch {epoch + 1}/{epochs} - Train MSE: {epoch_loss:.6f}")
+        _log(f"Epoch {epoch + 1}/{epochs} - Train MSE: {epoch_loss:.6f}")
 
     # Evaluation (MSE)
     model.eval()
@@ -230,9 +253,11 @@ def train_ffnn_local(hidden1=64, hidden2=32, lr=0.001, epochs=20, batch_size=64)
         test_preds = model(X_test_t)
         test_mse = criterion(test_preds, y_test_t).item()
     print(f"Test MSE: {test_mse:.6f}")
+    _log(f"Test MSE: {test_mse:.6f}")
 
     # Log feature info and model summary
     print("Feature info:", feature_info)
+    _log("=== FFNN training finished ===")
     return model, feature_info, {"test_mse": test_mse}
 
 

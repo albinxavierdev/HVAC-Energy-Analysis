@@ -1,0 +1,28 @@
+[2025-08-21T14:29:28] === FFNN training started ===
+[2025-08-21T14:29:28] Config: hidden1=64, hidden2=32, lr=0.001, epochs=20, batch_size=64
+[2025-08-21T14:29:29] Loaded rows from dynamic_control: 200
+[2025-08-21T14:29:29] Rows after target filtering: 200
+[2025-08-21T14:29:36] Input size after preprocessing: 94
+[2025-08-21T14:29:36] Feature info: {'numeric_feature_count': 4, 'categorical_cardinalities': {'equip_id': 80, 'point_id': 7, 'status': 3}, 'categorical_feature_count_after_onehot': 90, 'total_input_size': 94}
+[2025-08-21T14:29:36] Epoch 1/20 - Train MSE: 675185.492480
+[2025-08-21T14:29:36] Epoch 2/20 - Train MSE: 402426.763281
+[2025-08-21T14:29:36] Epoch 3/20 - Train MSE: 221671.181250
+[2025-08-21T14:29:36] Epoch 4/20 - Train MSE: 163960.639355
+[2025-08-21T14:29:36] Epoch 5/20 - Train MSE: 123676.817187
+[2025-08-21T14:29:36] Epoch 6/20 - Train MSE: 73081.155225
+[2025-08-21T14:29:36] Epoch 7/20 - Train MSE: 64024.947656
+[2025-08-21T14:29:36] Epoch 8/20 - Train MSE: 46523.716992
+[2025-08-21T14:29:36] Epoch 9/20 - Train MSE: 27491.064844
+[2025-08-21T14:29:36] Epoch 10/20 - Train MSE: 32729.036719
+[2025-08-21T14:29:37] Epoch 11/20 - Train MSE: 13865.440820
+[2025-08-21T14:29:37] Epoch 12/20 - Train MSE: 19589.728320
+[2025-08-21T14:29:37] Epoch 13/20 - Train MSE: 10778.266260
+[2025-08-21T14:29:37] Epoch 14/20 - Train MSE: 9514.095410
+[2025-08-21T14:29:37] Epoch 15/20 - Train MSE: 9856.233398
+[2025-08-21T14:29:37] Epoch 16/20 - Train MSE: 4051.124731
+[2025-08-21T14:29:37] Epoch 17/20 - Train MSE: 6287.187598
+[2025-08-21T14:29:37] Epoch 18/20 - Train MSE: 2381.136230
+[2025-08-21T14:29:37] Epoch 19/20 - Train MSE: 4732.441797
+[2025-08-21T14:29:37] Epoch 20/20 - Train MSE: 2279.509277
+[2025-08-21T14:29:37] Test MSE: 4571.658691
+[2025-08-21T14:29:37] === FFNN training finished ===
